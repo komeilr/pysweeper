@@ -267,6 +267,10 @@ class Tile:
         self.image = image
 
     def reveal_tile(self) -> None:
+        """
+        Changes the image of the tile to reveal the value
+        :return: None
+        """
         if not self.flagged:
             self.revealed = True
             self._update_image()
@@ -335,7 +339,17 @@ class Board:
 
 
 class Timer(tk.Label):
-    def __init__(self, master, controller, text, font):
+    """
+    Timer class used to increment the timer
+    """
+    def __init__(self, master, controller, text=000, font=("Arial", 20)):
+        """
+        Init method of Board class
+        :param master: parent widget
+        :param controller: game controller
+        :param text: text for timer [optional]
+        :param font: font family for timer [optional]
+        """
         super().__init__(master, text=text, font=font)
         self.controller = controller
         self.master = master
@@ -347,15 +361,27 @@ class Timer(tk.Label):
         self.job_id = 0
 
     def reset(self) -> None:
+        """
+        Stops counter and resets timer
+        :return: None
+        """
         self.stop()
         self.counter = -1
         self.config(text="000")
 
     def start(self) -> None:
+        """
+        Starts timer
+        :return: None
+        """
         self.running = True
         self.controller.root.after(0, self.update)
 
     def update(self) -> None:
+        """
+        Updates timer after 1000 ms
+        :return: None
+        """
         if self.running:
             self.counter += 1
             c_string = f"{self.counter:03}"
@@ -363,13 +389,25 @@ class Timer(tk.Label):
             self.job_id = self.controller.root.after(1000, self.update)
 
     def stop(self) -> None:
+        """
+        Stops timer
+        :return: None
+        """
         if self.running:
             self.running = False
             self.controller.root.after_cancel(self.job_id)
 
 
 class HotBar:
-    def __init__(self, master, controller):
+    """
+    Hotbar class that holds number of mines, start button and timer
+    """
+    def __init__(self, master, controller) -> None:
+        """
+        Init method of Hotbar class
+        :param master: parent widget
+        :param controller: game controller
+        """
         self.master = master
         self.controller = controller
         self.frame = tk.Frame(master, height=40, width=master.winfo_width(), borderwidth=1, relief=tk.RIDGE)
@@ -395,15 +433,29 @@ class HotBar:
         self.timer.pack(padx=(0, 5), pady=(5, 5), side=tk.LEFT)
 
     def _start_game(self, event) -> None:
+        """
+        Starts Game
+        :param event:
+        :return: None
+        """
         self.controller.start_game()
         self.update_button_image()
 
-    def update_mine_label(self, value):
+    def update_mine_label(self, value) -> None:
+        """
+        Updates the number of mines left
+        :param value: value of mines left
+        :return: None
+        """
         var = f"{value:02}"
         self.mine_var.set(var)
         self.controller.root.update_idletasks()
 
-    def update_button_image(self):
+    def update_button_image(self) -> None:
+        """
+        Update the image on the start button based on game_state
+        :return:
+        """
         if self.controller.game_state == GameState.IDLE:
             self.start_button.config(image=self.controller.images['idle'])
         elif self.controller.game_state == GameState.PLAYING:
@@ -411,7 +463,14 @@ class HotBar:
 
 
 class PySweeper:
+    """
+    Game controller class that holds game logic
+    """
     def __init__(self, rt: tk.Tk):
+        """
+        Init method of PySweeper class
+        :param rt: root tk window (tk.Tk object)
+        """
         self.cell_size = 30
         self.game_state = GameState.IDLE
         self.revealed_count = 0
@@ -424,13 +483,16 @@ class PySweeper:
         self.on_difficulty_change('beginner')
 
     def _init_gui(self) -> None:
-
+        """
+        method that initializes gui options
+        :return: None
+        """
         self.root.title("PySweeper")
         self.root.resizable(False, False)
         self._add_menubar()
         self._add_hotbar()
 
-    def _change_difficulty(self, diff):
+    def _change_difficulty(self, diff) -> None:
         self.difficulty = diff
         level = difficulty_dict[diff]
         self.mines = level.mines
